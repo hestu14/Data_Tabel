@@ -10,7 +10,7 @@
             border: 2px solid black;
             padding: 5px;
             border-collapse: collapse;
-        },
+        }
         /* td {
             border: 2px solid black;
             border-collapse: collapse;
@@ -43,8 +43,8 @@
                 <input type="date" name="ttl" required="required">
             </tr>
             <tr>
-            Kota :
-            <input type="text" name="city" required="required">
+                Kota :
+                <input type="text" name="city" required="required">
             </tr>
         </table>
     </form>
@@ -53,9 +53,21 @@
     <br>
 
     <button onclick="resetForm()">DAFTAR</button>
+
     <br>
     <br>
-    <table id="tabel Daftar">
+
+    <button onclick="sortNamaAsc()">Nama &#8593</button>
+    <button onclick="sortNamaDsc()">Nama &#8595</button>
+    <button onclick="sortUsiaAsc()">Usia &#8593</button>
+    <button onclick="sortUsiaDsc()">Usia &#8595</button>
+    <button onclick="sortKotaAsc()">Kota &#8593</button>
+    <button onclick="sortKotaDsc()">Kota &#8595</button>
+
+    <br>
+    <br>
+
+    <table id="tabelDaftar">
         <tr>
             <th>Nama</th>
             <th>Tanggal Lahir</th>
@@ -65,11 +77,52 @@
             <th>Kota</th>
             <th>Hapus</th>
         </tr>
-
     </table>
+
+
+
 </center>
 
     <script>
+
+
+            function resetForm() {
+
+            let form = document.forms['formPeserta'];
+            form.reset();
+            form['mode'].value = 'add';
+
+            }
+
+            function handleFormSubmit(formObj) {
+
+            let mode = formObj['mode'].value;
+            let name = formObj['name'].value;
+            let date = formObj['ttl'].value;
+            let city = formObj['city'].value;
+
+            let isSuccess = false;
+
+            if (mode === 'add') {
+                isSuccess = dataManagement.add(new Peserta(name, date, city));
+            }
+
+            if (isSuccess) {
+                dataManagement.refreshTable();
+            }
+
+            return false;
+            }
+
+            function loadDataToForm(idPeserta) {
+
+            let form = document.forms['formPeserta'];
+            document.getElementById('formTitle').innerHTML = 'Ubah Data';
+
+            let totalData = database.length;
+            let foundIndex = null;
+
+
         class Peserta {
             constructor(name, date, city) {
                 this.name = name;
@@ -78,7 +131,8 @@
             }
         }
 
-        let database = [];
+        let database = [new Peserta('Budi', '12/01/1986', "Ambon"),
+                        new Peserta('Deni', '24/09/1985', "Palu")];
 
         class DataManagement {
 
@@ -97,14 +151,14 @@
 
             // check apakah id peserta sudah pernah ada
             for (let i = 0; i < totalData; i++) {
-                if (database[i].id === peserta.id) {
+                if (database[i].name === peserta.name) {
                     valid = false;
                     break;
                 }
             }
 
             if (valid === false) {
-                alert('Data ID Peserta sudah ada, silahkan gunakan ID yang lain.');
+                alert('Nama Peserta sudah ada, silahkan gunakan yang lain.');
                 return false;
             }
 
@@ -112,188 +166,58 @@
 
             return true;
         }
+    
+            refreshTable() {
 
-    //     refreshTable() {
+            // Find a <table> element with id="daftarPeserta":
+            let tabelDaftarPeserta = document.getElementById('tabelDaftar');
+            let rowNumber = 1;
+            let totalData = database.length;
 
-    //     // Find a <table> element with id="daftarPeserta":
-    //     let tabelDaftar = document.getElementById('tabelDaftar');
-    //     let rowNumber = 1;
-    //     let totalData = database.length;
+            // Clean up table
+            let totalRows = tabelDaftarPeserta.rows.length;
 
-    //     // Clean up table
-    //     let totalRows = tabelDaftar.rows.length;
+            for (let i = 1; i < totalRows; i++) {
+                // kenapa indexnya selalu satu
+                // karena ketika row dihapus maka urutan index row akan bermodify atau ke reset kembali mulai dari 1
+                tabelDaftarPeserta.deleteRow(1);
+            }
 
-    //     for (let i = 1; i < totalRows; i++) {
-    //         // kenapa indexnya selalu satu
-    //         // karena ketika row dihapus maka urutan index row akan bermodify atau ke reset kembali mulai dari 1
-    //         tabelDaftar.deleteRow(1);
-    //     }
-        
-    //      function resetForm() {
+            for (let i = 0; i < totalData; i++) {
 
-    //         let form = document.forms['formPeserta'];
-    //         form.reset();
-    //         form['mode'].value = 'add';
+                let peserta = database[i];
 
-    //         document.getElementById('formTitle').innerHTML = 'Tambah Data';
+                // Create an empty <tr> element and add it to the 1st position of the table:
+                let row = tabelDaftarPeserta.insertRow(rowNumber);
 
-    //     }
+                // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                var cell5 = row.insertCell(2);
 
-    //     function handleFormSubmit(formObj) {
 
-    //         let mode = formObj['mode'].value;
-    //         let id = formObj['id'].value;
-    //         let name = formObj['name'].value;
+                // Add some text to the new cells:
+                cell1.innerHTML = peserta.name;
+                cell2.innerHTML = peserta.date;
+                cell3.innerHTML = "";
+                cell4.innerHTML = "";
+                cell5.innerHTML = "";
+                cell6.innerHTML = peserta.city;
+                cell7.innerHTML = "";
 
-    //         let isSuccess = false;
 
-    //         if (mode === 'add') {
-    //             isSuccess = dataManagement.add(new Peserta(id, name));
-    //         }
+                rowNumber++;
 
-    //         if (mode === 'modify') {
-    //             isSuccess = dataManagement.modify(new Peserta(id, name));
-    //         }
+            }
 
-    //         if (isSuccess) {
-    //             dataManagement.refreshTable();
-    //         }
+            }
 
-    //         return false;
-    //     }
+        }
 
-    //     function loadDataToForm(idPeserta) {
+    }
 
-    //         let form = document.forms['formPeserta'];
-    //         document.getElementById('formTitle').innerHTML = 'Ubah Data';
-
-    //         let totalData = database.length;
-    //         let foundIndex = null;
-
-    //         // cari data dengan id peserta tertentu
-    //         for (let i = 0; i < totalData; i++) {
-    //             if (database[i].id == idPeserta) {
-    //                 foundIndex = i;
-    //                 break;
-    //             }
-    //         }
-
-    //         if (foundIndex !== null) {
-    //             form['mode'].value = 'modify';
-    //             form['id'].value = database[foundIndex].id;
-    //             form['name'].value = database[foundIndex].name;
-    //         }
-    //     }
-    // function resetForm() {
-
-    //         let form = document.forms['formPeserta'];
-    //         form.reset();
-    //         form['mode'].value = 'add';
-
-    //         document.getElementById('formTitle').innerHTML = 'Tambah Data';
-
-    //     }
-
-    //     function handleFormSubmit(formObj) {
-
-    //         let mode = formObj['mode'].value;
-    //         let id = formObj['id'].value;
-    //         let name = formObj['name'].value;
-
-    //         let isSuccess = false;
-
-    //         if (mode === 'add') {
-    //             isSuccess = dataManagement.add(new Peserta(id, name));
-    //         }
-
-    //         if (mode === 'modify') {
-    //             isSuccess = dataManagement.modify(new Peserta(id, name));
-    //         }
-
-    //         if (isSuccess) {
-    //             dataManagement.refreshTable();
-    //         }
-
-    //         return false;
-    //     }
-
-    //     // function loadDataToForm(idPeserta) {
-
-    //     //     let form = document.forms['formPeserta'];
-    //     //     document.getElementById('formTitle').innerHTML = 'Ubah Data';
-
-    //     //     let totalData = database.length;
-    //     //     let foundIndex = null;
-
-    //     //     // cari data dengan id peserta tertentu
-    //     //     for (let i = 0; i < totalData; i++) {
-    //     //         if (database[i].id == idPeserta) {
-    //     //             foundIndex = i;
-    //     //             break;
-    //     //         }
-    //     //     }
-
-    //     //     if (foundIndex !== null) {
-    //     //         form['mode'].value = 'modify';
-    //     //         form['id'].value = database[foundIndex].id;
-    //     //         form['name'].value = database[foundIndex].name;
-    //     //     }
-    //     // }
-    //     function resetForm() {
-
-    //         let form = document.forms['formPeserta'];
-    //         form.reset();
-    //         form['mode'].value = 'add';
-
-    //         document.getElementById('formTitle').innerHTML = 'Tambah Data';
-
-    //         }
-
-    //         function handleFormSubmit(formObj) {
-
-    //         let mode = formObj['mode'].value;
-    //         let id = formObj['id'].value;
-    //         let name = formObj['name'].value;
-
-    //         let isSuccess = false;
-
-    //         if (mode === 'add') {
-    //             isSuccess = dataManagement.add(new Peserta(id, name));
-    //         }
-
-    //         if (mode === 'modify') {
-    //             isSuccess = dataManagement.modify(new Peserta(id, name));
-    //         }
-
-    //         if (isSuccess) {
-    //             dataManagement.refreshTable();
-    //         }
-
-    //         return false;
-    //         }
-
-    //         function loadDataToForm(idPeserta) {
-
-    //         let form = document.forms['formPeserta'];
-    //         document.getElementById('formTitle').innerHTML = 'Ubah Data';
-
-    //         let totalData = database.length;
-    //         let foundIndex = null;
-
-    //         // cari data dengan id peserta tertentu
-    //         for (let i = 0; i < totalData; i++) {
-    //             if (database[i].id == idPeserta) {
-    //                 foundIndex = i;
-    //                 break;
-    //             }
-    //         }
-
-    //         if (foundIndex !== null) {
-    //             form['mode'].value = 'modify';
-    //             form['id'].value = database[foundIndex].id;
-    //             form['name'].value = database[foundIndex].name;
-    //         }
-    //         }
+            let dataManagement = new DataManagement();
+            dataManagement.refreshTable();
 
     </script>
 
