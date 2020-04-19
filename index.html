@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Data Tabel</title>
+
+    <style>
+        table,
+        th {
+            border: 2px solid black;
+            padding: 5px;
+            border-collapse: collapse;
+        },
+        /* td {
+            border: 2px solid black;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 5px;
+        } */
+
+        span {
+            font-style: italic;
+            background-color: yellow;
+        }
+    </style>
+</head>
+
+<body>
+<center>
+    <h3 id="formTitle"></h3>
+    <form name="formPeserta" onsubmit="return handleFormSubmit(this)">
+        <input type="hidden" name="mode" value="add">
+
+        <table>
+            <tr>
+                Nama :
+                <input type="text" name="name" required="required">
+            </tr>
+            <tr>
+                Tanggal Lahir :
+                <input type="date" name="ttl" required="required">
+            </tr>
+            <tr>
+            Kota :
+            <input type="text" name="city" required="required">
+            </tr>
+        </table>
+    </form>
+
+    <br>
+    <br>
+
+    <button onclick="resetForm()">DAFTAR</button>
+    <br>
+    <br>
+    <table id="tabel Daftar">
+        <tr>
+            <th>Nama</th>
+            <th>Tanggal Lahir</th>
+            <th>Zodiak</th>
+            <th>Usia</th>
+            <th>Pensiun</th>
+            <th>Kota</th>
+            <th>Hapus</th>
+        </tr>
+
+    </table>
+</center>
+
+    <script>
+        class Peserta {
+            constructor(name, date, city) {
+                this.name = name;
+                this.date = date;
+                this.city = city;
+            }
+        }
+
+        let database = [];
+
+        class DataManagement {
+
+        constructor() {}
+
+        add(peserta) {
+
+            // memastikan parameter seusia dengan object peserta
+            if (peserta instanceof Peserta === false) {
+                alert('Object peserta tidak valid.');
+                return false;
+            }
+
+            let totalData = database.length;
+            let valid = true;
+
+            // check apakah id peserta sudah pernah ada
+            for (let i = 0; i < totalData; i++) {
+                if (database[i].id === peserta.id) {
+                    valid = false;
+                    break;
+                }
+            }
+
+            if (valid === false) {
+                alert('Data ID Peserta sudah ada, silahkan gunakan ID yang lain.');
+                return false;
+            }
+
+            database.push(peserta);
+
+            return true;
+        }
+
+    //     refreshTable() {
+
+    //     // Find a <table> element with id="daftarPeserta":
+    //     let tabelDaftar = document.getElementById('tabelDaftar');
+    //     let rowNumber = 1;
+    //     let totalData = database.length;
+
+    //     // Clean up table
+    //     let totalRows = tabelDaftar.rows.length;
+
+    //     for (let i = 1; i < totalRows; i++) {
+    //         // kenapa indexnya selalu satu
+    //         // karena ketika row dihapus maka urutan index row akan bermodify atau ke reset kembali mulai dari 1
+    //         tabelDaftar.deleteRow(1);
+    //     }
+        
+    //      function resetForm() {
+
+    //         let form = document.forms['formPeserta'];
+    //         form.reset();
+    //         form['mode'].value = 'add';
+
+    //         document.getElementById('formTitle').innerHTML = 'Tambah Data';
+
+    //     }
+
+    //     function handleFormSubmit(formObj) {
+
+    //         let mode = formObj['mode'].value;
+    //         let id = formObj['id'].value;
+    //         let name = formObj['name'].value;
+
+    //         let isSuccess = false;
+
+    //         if (mode === 'add') {
+    //             isSuccess = dataManagement.add(new Peserta(id, name));
+    //         }
+
+    //         if (mode === 'modify') {
+    //             isSuccess = dataManagement.modify(new Peserta(id, name));
+    //         }
+
+    //         if (isSuccess) {
+    //             dataManagement.refreshTable();
+    //         }
+
+    //         return false;
+    //     }
+
+    //     function loadDataToForm(idPeserta) {
+
+    //         let form = document.forms['formPeserta'];
+    //         document.getElementById('formTitle').innerHTML = 'Ubah Data';
+
+    //         let totalData = database.length;
+    //         let foundIndex = null;
+
+    //         // cari data dengan id peserta tertentu
+    //         for (let i = 0; i < totalData; i++) {
+    //             if (database[i].id == idPeserta) {
+    //                 foundIndex = i;
+    //                 break;
+    //             }
+    //         }
+
+    //         if (foundIndex !== null) {
+    //             form['mode'].value = 'modify';
+    //             form['id'].value = database[foundIndex].id;
+    //             form['name'].value = database[foundIndex].name;
+    //         }
+    //     }
+    // function resetForm() {
+
+    //         let form = document.forms['formPeserta'];
+    //         form.reset();
+    //         form['mode'].value = 'add';
+
+    //         document.getElementById('formTitle').innerHTML = 'Tambah Data';
+
+    //     }
+
+    //     function handleFormSubmit(formObj) {
+
+    //         let mode = formObj['mode'].value;
+    //         let id = formObj['id'].value;
+    //         let name = formObj['name'].value;
+
+    //         let isSuccess = false;
+
+    //         if (mode === 'add') {
+    //             isSuccess = dataManagement.add(new Peserta(id, name));
+    //         }
+
+    //         if (mode === 'modify') {
+    //             isSuccess = dataManagement.modify(new Peserta(id, name));
+    //         }
+
+    //         if (isSuccess) {
+    //             dataManagement.refreshTable();
+    //         }
+
+    //         return false;
+    //     }
+
+    //     // function loadDataToForm(idPeserta) {
+
+    //     //     let form = document.forms['formPeserta'];
+    //     //     document.getElementById('formTitle').innerHTML = 'Ubah Data';
+
+    //     //     let totalData = database.length;
+    //     //     let foundIndex = null;
+
+    //     //     // cari data dengan id peserta tertentu
+    //     //     for (let i = 0; i < totalData; i++) {
+    //     //         if (database[i].id == idPeserta) {
+    //     //             foundIndex = i;
+    //     //             break;
+    //     //         }
+    //     //     }
+
+    //     //     if (foundIndex !== null) {
+    //     //         form['mode'].value = 'modify';
+    //     //         form['id'].value = database[foundIndex].id;
+    //     //         form['name'].value = database[foundIndex].name;
+    //     //     }
+    //     // }
+    //     function resetForm() {
+
+    //         let form = document.forms['formPeserta'];
+    //         form.reset();
+    //         form['mode'].value = 'add';
+
+    //         document.getElementById('formTitle').innerHTML = 'Tambah Data';
+
+    //         }
+
+    //         function handleFormSubmit(formObj) {
+
+    //         let mode = formObj['mode'].value;
+    //         let id = formObj['id'].value;
+    //         let name = formObj['name'].value;
+
+    //         let isSuccess = false;
+
+    //         if (mode === 'add') {
+    //             isSuccess = dataManagement.add(new Peserta(id, name));
+    //         }
+
+    //         if (mode === 'modify') {
+    //             isSuccess = dataManagement.modify(new Peserta(id, name));
+    //         }
+
+    //         if (isSuccess) {
+    //             dataManagement.refreshTable();
+    //         }
+
+    //         return false;
+    //         }
+
+    //         function loadDataToForm(idPeserta) {
+
+    //         let form = document.forms['formPeserta'];
+    //         document.getElementById('formTitle').innerHTML = 'Ubah Data';
+
+    //         let totalData = database.length;
+    //         let foundIndex = null;
+
+    //         // cari data dengan id peserta tertentu
+    //         for (let i = 0; i < totalData; i++) {
+    //             if (database[i].id == idPeserta) {
+    //                 foundIndex = i;
+    //                 break;
+    //             }
+    //         }
+
+    //         if (foundIndex !== null) {
+    //             form['mode'].value = 'modify';
+    //             form['id'].value = database[foundIndex].id;
+    //             form['name'].value = database[foundIndex].name;
+    //         }
+    //         }
+
+    </script>
+
+</body>
+
+</html>
