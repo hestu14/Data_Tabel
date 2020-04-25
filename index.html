@@ -5,20 +5,18 @@
     <title>Data Tabel</title>
 
     <style>
+
+
         table,
-        th {
-            border: 2px solid black;
-            padding: 5px;
-            border-collapse: collapse;
-        }
-        /* td {
-            border: 2px solid black;
+        th  ,
+        td {
+            border: 2px solid blue;
             border-collapse: collapse;
         }
 
         td {
-            padding: 5px;
-        } */
+            padding: 10px;
+        }
 
         span {
             font-style: italic;
@@ -31,16 +29,15 @@
 <center>
     <h3 id="formTitle"></h3>
     <form name="formPeserta" onsubmit="return handleFormSubmit(this)">
-        <input type="hidden" name="mode" value="add">
 
         <table>
             <tr>
                 Nama :
-                <input type="text" name="name" required="required">
+                <input type="text" name="nama" required="required">
             </tr>
             <tr>
                 Tanggal Lahir :
-                <input type="date" name="ttl" required="required">
+                <input type="date" name="kota" required="required">
             </tr>
             <tr>
                 Kota :
@@ -52,29 +49,29 @@
     <br>
     <br>
 
-    <button onclick="resetForm()">DAFTAR</button>
+    <button>DAFTAR</button>
 
     <br>
     <br>
 
-    <button onclick="sortNamaAsc()">Nama &#8593</button>
-    <button onclick="sortNamaDsc()">Nama &#8595</button>
-    <button onclick="sortUsiaAsc()">Usia &#8593</button>
-    <button onclick="sortUsiaDsc()">Usia &#8595</button>
-    <button onclick="sortKotaAsc()">Kota &#8593</button>
-    <button onclick="sortKotaDsc()">Kota &#8595</button>
+    <button onclick="sortNameAscending()">Nama &#8593</button>
+    <button onclick="sortNameDescending()">Nama &#8595</button>
+    <button onclick="sortAgeAscending()">Usia &#8593</button>
+    <button onclick="sortAgeDescending()">Usia &#8595</button>
+    <button onclick="sortCityAscending()">Kota &#8593</button>
+    <button onclick="sortCityDescending()">Kota &#8595</button>
 
     <br>
     <br>
 
-    <table id="tabelDaftar">
+    <table id="tabelDaftarPeserta">
         <tr>
-            <th>Nama</th>
-            <th>Tanggal Lahir</th>
-            <th>Zodiak</th>
-            <th>Usia</th>
-            <th>Pensiun</th>
-            <th>Kota</th>
+            <th onclick="sortTable(0)">Nama</th>
+            <th onclick="sortTable(1)" colspan="3">Tanggal Lahir</th>
+            <th onclick="sortTable(2)">Zodiak</th>
+            <th onclick="sortTable(3)">Usia</th>
+            <th onclick="sortTable(4)">Pensiun</th>
+            <th onclick="sortTable(5)">Kota</th>
             <th>Hapus</th>
         </tr>
     </table>
@@ -85,139 +82,424 @@
 
     <script>
 
-
-            function resetForm() {
-
-            let form = document.forms['formPeserta'];
-            form.reset();
-            form['mode'].value = 'add';
-
-            }
-
-            function handleFormSubmit(formObj) {
-
-            let mode = formObj['mode'].value;
-            let name = formObj['name'].value;
-            let date = formObj['ttl'].value;
-            let city = formObj['city'].value;
-
-            let isSuccess = false;
-
-            if (mode === 'add') {
-                isSuccess = dataManagement.add(new Peserta(name, date, city));
-            }
-
-            if (isSuccess) {
-                dataManagement.refreshTable();
-            }
-
-            return false;
-            }
-
-            function loadDataToForm(idPeserta) {
-
-            let form = document.forms['formPeserta'];
-            document.getElementById('formTitle').innerHTML = 'Ubah Data';
-
-            let totalData = database.length;
-            let foundIndex = null;
-
-
-        class Peserta {
-            constructor(name, date, city) {
-                this.name = name;
-                this.date = date;
-                this.city = city;
-            }
+function sortTable(n) {
+  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+  table = document.getElementById("tabelDaftarPeserta");
+  switching = true;
+  //Set the sorting direction to ascending:
+  dir = "asc"; 
+  /*Make a loop that will continue until
+  no switching has been done:*/
+  while (switching) {
+    //start by saying: no switching is done:
+    switching = false;
+    rows = table.rows;
+    /*Loop through all table rows (except the
+    first, which contains table headers):*/
+    for (i = 1; i < (rows.length - 1); i++) {
+      //start by saying there should be no switching:
+      shouldSwitch = false;
+      /*Get the two elements you want to compare,
+      one from current row and one from the next:*/
+      x = rows[i].getElementsByTagName("TD")[n];
+      y = rows[i + 1].getElementsByTagName("TD")[n];
+      /*check if the two rows should switch place,
+      based on the direction, asc or desc:*/
+      if (dir == "asc") {
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          //if so, mark as a switch and break the loop:
+          shouldSwitch= true;
+          break;
         }
-
-        let database = [new Peserta('Budi', '12/01/1986', "Ambon"),
-                        new Peserta('Deni', '24/09/1985', "Palu")];
-
-        class DataManagement {
-
-        constructor() {}
-
-        add(peserta) {
-
-            // memastikan parameter seusia dengan object peserta
-            if (peserta instanceof Peserta === false) {
-                alert('Object peserta tidak valid.');
-                return false;
-            }
-
-            let totalData = database.length;
-            let valid = true;
-
-            // check apakah id peserta sudah pernah ada
-            for (let i = 0; i < totalData; i++) {
-                if (database[i].name === peserta.name) {
-                    valid = false;
-                    break;
-                }
-            }
-
-            if (valid === false) {
-                alert('Nama Peserta sudah ada, silahkan gunakan yang lain.');
-                return false;
-            }
-
-            database.push(peserta);
-
-            return true;
+      } else if (dir == "desc") {
+        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+          //if so, mark as a switch and break the loop:
+          shouldSwitch = true;
+          break;
         }
-    
-            refreshTable() {
+      }
+    }
+    if (shouldSwitch) {
+      /*If a switch has been marked, make the switch
+      and mark that a switch has been done:*/
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+      //Each time a switch is done, increase this count by 1:
+      switchcount ++;      
+    } else {
+      /*If no switching has been done AND the direction is "asc",
+      set the direction to "desc" and run the while loop again.*/
+      if (switchcount == 0 && dir == "asc") {
+        dir = "desc";
+        switching = true;
+      }
+    }
+  }
+}
 
-            // Find a <table> element with id="daftarPeserta":
-            let tabelDaftarPeserta = document.getElementById('tabelDaftar');
-            let rowNumber = 1;
-            let totalData = database.length;
+function sortNameAscending() {
 
-            // Clean up table
-            let totalRows = tabelDaftarPeserta.rows.length;
+// It should return:
+// something negative if first argument is less than second (should be placed before the second in resulting array)
+// something positive if first argument is greater (should be placed after second one)
+// 0 if those two elements are equal.
+// source: https://stackoverflow.com/questions/6712034/sort-array-by-firstname-alphabetically-in-javascript
+let sorted = database.sort(function (a, b) {
+    if (a.nama < b.nama) {
+        return -1;
+    }
+    if (a.nama > b.nama) {
+        return 1;
+    }
+    return 0;
+});
 
-            for (let i = 1; i < totalRows; i++) {
-                // kenapa indexnya selalu satu
-                // karena ketika row dihapus maka urutan index row akan bermodify atau ke reset kembali mulai dari 1
-                tabelDaftarPeserta.deleteRow(1);
-            }
+//console.log(sorted);
 
-            for (let i = 0; i < totalData; i++) {
+database = sorted;
+dataManagement.refreshTable();
+}
 
-                let peserta = database[i];
+function sortNameDescending() {
+let sorted = database.sort(function (a, b) {
+    if (a.nama < b.nama) {
+        return 1;
+    }
+    if (a.nama > b.nama) {
+        return -1;
+    }
+    return 0;
+});
 
-                // Create an empty <tr> element and add it to the 1st position of the table:
-                let row = tabelDaftarPeserta.insertRow(rowNumber);
+//console.log(sorted);
 
-                // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
-                var cell1 = row.insertCell(0);
-                var cell2 = row.insertCell(1);
-                var cell5 = row.insertCell(2);
+database = sorted;
+dataManagement.refreshTable();
+}
 
+function sortAgeAscending() {
+let sorted = database.sort(function (a, b) {
+    if (a.usia < b.usia) {
+        return 1;
+    }
+    if (a.usia > b.usia) {
+        return -1;
+    }
+    return 0;
+});
 
-                // Add some text to the new cells:
-                cell1.innerHTML = peserta.name;
-                cell2.innerHTML = peserta.date;
-                cell3.innerHTML = "";
-                cell4.innerHTML = "";
-                cell5.innerHTML = "";
-                cell6.innerHTML = peserta.city;
-                cell7.innerHTML = "";
+//console.log(sorted);
 
+database = sorted;
+dataManagement.refreshTable();
+}
 
-                rowNumber++;
+function sortAgeDescending() {
+let sorted = database.sort(function (a, b) {
+    if (a.usia < b.usia) {
+        return -1;
+    }
+    if (a.usia > b.usia) {
+        return 1;
+    }
+    return 0;
+});
 
-            }
+//console.log(sorted);
 
-            }
+database = sorted;
+dataManagement.refreshTable();
 
+}
+
+function sortCityAscending() {
+let sorted = database.sort(function (a, b) {
+    if (a.kota < b.kota) {
+        return 1;
+    }
+    if (a.kota > b.kota) {
+        return -1;
+    }
+    return 0;
+});
+
+//console.log(sorted);
+
+database = sorted;
+dataManagement.refreshTable();
+
+}
+
+function sortCityDescending() {
+let sorted = database.sort(function (a, b) {
+    if (a.kota < b.kota) {
+        return -1;
+    }
+    if (a.kota > b.kota) {
+        return 1;
+    }
+    return 0;
+});
+
+//console.log(sorted);
+
+database = sorted;
+dataManagement.refreshTable();
+
+}
+
+function handleFormSubmit(formObj) {
+let nama = formObj['nama'].value;
+let tanggalLahir = formObj['tanggalLahir'].value;
+let kota = formObj['kota'].value;
+
+let isSuccess = dataManagement.add(new Peserta(nama, tanggalLahir, kota));
+
+if (isSuccess) {
+    dataManagement.refreshTable();
+}
+
+return false;
+}
+
+class Peserta {
+
+usia = 0;
+zodiak = 0;
+pensiun = 0;
+
+constructor(nama, tglLahir, kota) {
+    this.nama = nama;
+    this.tanggalLahir = tglLahir;
+
+    this.usia = (new Date).getFullYear() - (new Date(tglLahir)).getFullYear();
+
+    this.pensiun = this.usia - 55;
+    this.kota = kota;
+    this.zodiak = this.getZodiacName(tglLahir);
+}
+
+getZodiacName(birthDate) {
+    let date = new Date(birthDate);
+    let simpleDate = parseInt((date.getMonth() + 1).toString() + date.getDate().toString());
+    // 112
+    // 924
+
+    let zodiacName = '';
+    let zodiacTropis = [{
+            name: 'Aries',
+            from: 321, // 21 maret
+            to: 420 // 20 april
+        },
+        {
+            name: 'Taurus',
+            from: 421, // 21 april
+            to: 521 // 21 mei
+        }, {
+            name: 'Gemini',
+            from: 522, // 22 mei
+            to: 621 // 21 juni
+        }, {
+            name: 'Cancer',
+            from: 622, // 22 juni
+            to: 723 // 23 juli
+        }, {
+            name: 'Leo',
+            from: 724, // 24 juli
+            to: 823 // 23 agustus
+        }, {
+            name: 'Virgo',
+            from: 824, // 24 Agustus
+            to: 923 // 23 September
+        }, {
+            name: 'Libra',
+            from: 924, // 24 september
+            to: 1023 // 23 oktober
+        }, {
+            name: 'Scorpio',
+            from: 1024, // 24 oktober
+            to: 1122 // 22 november
+        }, {
+            name: 'Sagitarius',
+            from: 1123, // 23 November
+            to: 1222 // 22 desember
+        }, {
+            name: 'Capricornus',
+            from: 1223, // 23 desember
+            to: 120 // 20 januari
+        }, {
+            name: 'Aquarius',
+            from: 121, // 21 januari
+            to: 219 // 19 februari
+        }, {
+            name: 'Pisces',
+            from: 220, // 20 februari
+            to: 320 // 20 maret
         }
+    ];
+
+    for (let i = 0; i < zodiacTropis.length; i++) {
+        let zodiacData = zodiacTropis[i];
+
+        //console.log(`${simpleDate} >= ${zodiacData.from} && ${simpleDate} <= ${zodiacData.to}`);
+
+        if (simpleDate >= zodiacData.from && simpleDate <= zodiacData.to) {
+            zodiacName = zodiacData.name;
+            break;
+        }
+    }
+
+    if (zodiacName.length === 0) {
+        zodiacName = 'Capricornus';
+    }
+
+    return zodiacName;
+}
+}
+
+let database = [
+new Peserta('Budi', '01/12/1986', 'Ambon'),
+new Peserta('Deni', '09/24/1985', 'Palu'),
+];
+
+class DataManagement {
+
+months = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+];
+
+constructor() {}
+
+add(peserta) {
+
+    // memastikan parameter sesuai dengan object peserta
+    if (peserta instanceof Peserta === false) {
+        alert('Object peserta tidak valid.');
+        return false;
+    }
+
+    let totalData = database.length;
+    let valid = true;
+
+    // check apakah id peserta sudah pernah ada
+    for (let i = 0; i < totalData; i++) {
+        if (database[i].nama === peserta.nama) {
+            valid = false;
+            break;
+        }
+    }
+
+    if (valid === false) {
+        alert('Data nama Peserta sudah ada, silahkan gunakan nama yang lain.');
+        return false;
+    }
+
+    database.push(peserta);
+
+    return true;
+}
+
+hapus(nama) {
+
+    let totalData = database.length;
+    let deleteIndex = null;
+
+    // cari data dengan id peserta tertentu
+    for (let i = 0; i < totalData; i++) {
+        if (database[i].nama == nama) {
+            deleteIndex = i;
+            break;
+        }
+    }
+
+    if (deleteIndex === null) {
+        alert(`Data dengan nama peserta ${nama} tidak ditemukan.`);
+        return false;
+    }
+
+    if (confirm(`Apakah Anda yakin akan menghapus data dengan nama ${nama}`)) {
+
+        database.splice(deleteIndex, 1);
+        this.refreshTable();
+        return true;
+    }
+
+    return false;
+}
+
+refreshTable() {
+
+    // Find a <table> element with id="daftarPeserta":
+    let tabelDaftarPeserta = document.getElementById('tabelDaftarPeserta');
+    let rowNumber = 1;
+    let totalData = database.length;
+
+    // Clean up table
+    let totalRows = tabelDaftarPeserta.rows.length;
+
+    for (let i = 1; i < totalRows; i++) {
+        // kenapa indexnya selalu satu
+        // karena ketika row dihapus maka urutan index row akan bermodify atau ke reset kembali mulai dari 1
+        tabelDaftarPeserta.deleteRow(1);
+    }
+
+    for (let i = 0; i < totalData; i++) {
+
+        let peserta = database[i];
+
+        //console.log(peserta);
+
+        // Create an empty <tr> element and add it to the 1st position of the table:
+        let row = tabelDaftarPeserta.insertRow(rowNumber);
+
+        // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        var cell5 = row.insertCell(4);
+        var cell6 = row.insertCell(5);
+        var cell7 = row.insertCell(6);
+        var cell8 = row.insertCell(7);
+        var cell9 = row.insertCell(8);
+
+        let tanggalLahir = new Date(peserta.tanggalLahir);
+
+        // Add some text to the new cells:
+        cell1.innerHTML = peserta.nama;
+        cell2.innerHTML = tanggalLahir.getDate();
+        cell3.innerHTML = this.months[tanggalLahir.getMonth()];
+        cell4.innerHTML = tanggalLahir.getFullYear();
+
+        cell5.innerHTML = peserta.zodiak;
+        cell6.innerHTML = peserta.usia;
+        cell7.innerHTML = peserta.pensiun;
+        cell8.innerHTML = peserta.kota;
+
+        cell9.style.textAlign = "center";
+        cell9.innerHTML =
+            `<button onclick='dataManagement.hapus("${peserta.nama}")'>Delete</button>`;
 
     }
 
-            let dataManagement = new DataManagement();
-            dataManagement.refreshTable();
+}
+
+}
+
+let dataManagement = new DataManagement();
+dataManagement.refreshTable();
+
 
     </script>
 
